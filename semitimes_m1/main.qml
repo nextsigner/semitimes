@@ -1,200 +1,287 @@
-//reloj/main.qml
-//home/nextsigner/Escritorio/reloj/main.qml
-//-folder /home/nextsigner/Escritorio/reloj
 import QtQuick 2.0
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.3
 import QtQuick.Window 2.0
-import uk 1.0
+import Qt.labs.settings 1.0
 ApplicationWindow{
-	id: app
-	visible:true
-	width:300
-	height:300
-	color: "transparent"
-	title: "Reloj"
-	flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
-	property int h: 0
-	property int m: 0
-	property int s: 0
-	
-	Rectangle{
-		id: reloj
-		width: 300
-		height: 300
-		radius: width*0.5
-		color: "black"
-		border.width:2
-		border.color: "white"
-		anchors.centerIn: parent
-		clip:true
-		MouseArea{
-            		id: max
-            		property variant clickPos: "1,1"
-            		property bool presionado: false
-            		anchors.fill: parent
-	    		onDoubleClicked: {
-                		Qt.quit()
-            		}
-	    		onReleased: {
-                		presionado = false
-            		}
-            		onPressed: {
-                		presionado = true
-                		clickPos  = Qt.point(mouse.x,mouse.y)
-            		}            
-            		onPositionChanged: {
-                		if(presionado){
-                    			var delta = Qt.point(mouse.x-clickPos.x, mouse.y-clickPos.y)
-                    			app.x += delta.x;
-                    			app.y += delta.y;
-                		}
-            		}
-	    		//hovered: true          
-	     		onWheel: {
-                		if (wheel.modifiers & Qt.ControlModifier && app.width>150) {
-                    			app.width += wheel.angleDelta.y / 120
-					app.height = app.width
-					reloj.width = app.width
-					reloj.height = app.width 
-		                }
-            		}
-        	}
-		Image{
-			width: reloj.width*0.6			
-			height: reloj.width*0.6
-			//fillMode: Image.PreserveAspectFit
-			source: "file://"+sourcePath+"/cris.png"
-			//opacity: 0.65
-			anchors.centerIn: parent
-		}
-		Item{
-			width:reloj.width*0.9
-			height:reloj.height*0.85
-			anchors.centerIn: reloj
-			Repeater{
-				model:60
-				Item{
-					width: parent.width*0.08
-					height: parent.height
-					anchors.centerIn: parent
-					rotation: (360/60)*index
-					Rectangle{
-						width:2
-						height:reloj.width*0.02
-						color: "red"
-						anchors.horizontalCenter: parent.horizontalCenter
-						//radius: width*0.5
-					}
-						
-				}
-			}
-		}
-		Item{
-			width:reloj.width*0.9
-			height:reloj.height*0.9
-			anchors.centerIn: reloj
-			Repeater{
-				model:["12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"]
-				Item{
-					width: parent.width*0.08
-					height: parent.height
-					anchors.centerIn: parent
-					rotation: (360/12)*index
-					Rectangle{
-						width:parent.width
-						height:width
-						color: "red"
-						radius: width*0.5
-						Text{
-							text:modelData
-							font.pixelSize: parent.width*0.6
-							anchors.centerIn: parent
-color: "white"
-rotation: 0-((360/12)*index)
-						}
-					}
-				}
-			}
-		}
-		Rectangle{
-			id: agujaHoras
-			color: "transparent"
-			height: parent.height*0.5
-			width: parent.width*0.02
-			anchors.centerIn: parent
-			Rectangle{
-				width: parent.width
-				height: parent.height*0.5
-				color: "red"
-			}
-			
-		}
-		Rectangle{
-			id: agujaMinutos
-			color: "transparent"
-			height: parent.height*0.75
-			width: parent.width*0.02
-			anchors.centerIn: parent
-			onRotationChanged:{
-				if(rotation>=360){
-					rotation=0
-			agujaHoras.rotation=agujaHoras.rotation+(parseInt(360/12))		
-				}
-			}
-			Rectangle{
-				width: parent.width*0.65
-				height: parent.height*0.5
-				color: "green"
-			}
-		}
-		Rectangle{
-			id: agujaSegundos
-			color: "transparent"
-			height: parent.height*0.85
-			width: parent.width*0.02
-			anchors.centerIn: parent
-			onRotationChanged:{
-				if(rotation>=360){
-					rotation=0
-			agujaMinutos.rotation=agujaMinutos.rotation+(360/60)		
-				}
-			}
-			Rectangle{
-				width: parent.width*0.3
-				height: parent.height*0.5
-				color: "red"
-				anchors.horizontalCenter: parent.horizontalCenter
-			}
-		}
-		Rectangle{
-			id: centro
-			color: "red"
-			height: width
-			width: parent.width*0.03
-			radius: width*0.5
-			anchors.centerIn: parent
-			
-		}
-	}
+    id: app
+    visible:true
+    width:300
+    height:300
+    color: "transparent"
+    title: "semitimes m1"
+    flags: Qt.platform.os !=='android'?Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint:undefined
+    property int h: 0
+    property int m: 0
+    property int s: 0
 
-	Timer{
-		id: t
-		running: false
-		repeat: true
-		interval: 1000
-		onTriggered:{
-			agujaSegundos.rotation = agujaSegundos.rotation+(360/60)	
-		}
-	}
-	Component.onCompleted:{
-		var d = new Date(Date.now())
-		app.h=d.getHours()
-		app.m=d.getMinutes()
-		app.s=d.getSeconds()
-		agujaSegundos.rotation = (360/60)*app.s
-		agujaMinutos.rotation = (360/60)*app.m
-		agujaHoras.rotation = (360/12)*app.h
-		t.start()
-	}
+    property color c1: "#1fbc05"
+    property color c2: "#4fec35"
+    property color c3: "white"
+    property color c4: "black"
+    property color c5: "#333333"
+
+    Settings{
+        id: appSettings
+        category:'conf-semitimes-m1'
+        property real radnh:0.8
+        property real radlm:0.8
+        property int w: 300
+        property int h: 300
+        property int x: 300
+        property int y: 300
+    }
+
+    Rectangle{
+        id: reloj
+        width: app.width
+        height: app.height
+        radius: width*0.5
+        color: app.c5
+        border.width:1
+        border.color: app.c1
+        anchors.centerIn: parent
+        clip:true
+        antialiasing: true
+        MouseArea{
+            id: max
+            property variant clickPos: "1,1"
+            property bool presionado: false
+            anchors.fill: parent
+            onDoubleClicked: {
+                Qt.quit()
+            }
+            onReleased: {
+                presionado = false
+                appSettings.x = app.x
+                appSettings.y = app.y
+            }
+            onPressed: {
+                presionado = true
+                clickPos  = Qt.point(mouse.x,mouse.y)
+            }
+            onPositionChanged: {
+                if(presionado){
+                    var delta = Qt.point(mouse.x-clickPos.x, mouse.y-clickPos.y)
+                    app.x += delta.x;
+                    app.y += delta.y;
+                }
+            }
+            onWheel: {
+                if (wheel.modifiers & Qt.ControlModifier) {
+                    if(app.width<150){
+                        return
+                    }
+                    app.width += wheel.angleDelta.y / 120
+                    app.height = app.width
+                    reloj.width = app.width
+                    reloj.height = app.width
+                }
+                if(app.width<=149){
+                    app.width=151
+                    app.height = app.width
+                }
+                appSettings.x = app.x
+                appSettings.y = app.y
+                appSettings.w = app.width
+                appSettings.h = app.height
+            }
+        }
+        Image{
+            width: reloj.width*0.6
+            height: reloj.width*0.6
+            source: "file://"+sourcePath+"/cris.png"
+            anchors.centerIn: parent
+        }
+        Rectangle{
+            smooth: true
+            width: 1
+            height: parent.height*0.6
+            gradient: Gradient {
+                GradientStop {
+                    position: 0.00;
+                    color: app.c5;
+                }
+                GradientStop {
+                    position: 0.5;
+                    color: "#ffffff";
+                }
+                GradientStop {
+                    position: 1.00;
+                    color: app.c5;
+                }
+            }
+            anchors.centerIn: parent
+            opacity: 0.5
+        }
+        Rectangle{
+            rotation: 90
+            smooth: true
+            width: 1
+            height: parent.height*0.6
+            gradient: Gradient {
+                GradientStop {
+                    position: 0.00;
+                    color: app.c5;
+                }
+                GradientStop {
+                    position: 0.5;
+                    color: "#ffffff";
+                }
+                GradientStop {
+                    position: 1.00;
+                    color: app.c5;
+                }
+            }
+            anchors.centerIn: parent
+            opacity: 0.5
+        }
+
+        Rectangle{
+            id:xMH
+            //width:!app.width*appSettings.radnm % 2 ? app.width*appSettings.radnm : app.width*appSettings.radnm+1
+            width: reloj.width*appSettings.radlm
+            height:width
+            anchors.centerIn: reloj
+            color: "transparent"
+            Repeater{
+                model:60
+                Item{
+                    width: !reloj.width*0.005 % 2 ? (reloj.width*0.005)+1 : reloj.width*0.005
+                    height: parent.height
+                    anchors.centerIn: parent
+                    rotation: (360/60)*index
+                    Rectangle{
+                        width: parent.width
+                        height: parent.height*0.02
+                        color: app.c2
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        antialiasing: true
+                    }
+                }
+            }
+        }
+
+        Rectangle{
+            width:!reloj.width*appSettings.radnh % 2 ? reloj.width*appSettings.radnh : reloj.width*appSettings.radnh+1
+            height:width
+            anchors.centerIn: reloj
+            color: "transparent"
+            Repeater{
+                model:["12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"]
+                Item{
+                    width: parent.width*0.08
+                    height: parent.height
+                    anchors.centerIn: parent
+                    rotation: (360/12)*index
+                    Rectangle{
+                        width:parent.width
+                        height:width
+                        color: app.c1
+                        border.color: app.c2
+                        border.width: 1
+                        radius: width*0.5
+                        Text{
+                            text:modelData
+                            font.pixelSize: parent.width*0.6
+                            anchors.centerIn: parent
+                            color: app.c5
+                            rotation: 0-((360/12)*index)
+                        }
+                    }
+                }
+            }
+        }
+
+
+        Rectangle{
+            id: agujaMinutos
+            color: "transparent"
+            height: parent.height*0.75
+            width: !parent.width*0.02 % 2 ? parent.width*0.02 : parent.width*0.02+1
+            anchors.centerIn: parent
+            antialiasing: true
+            Rectangle{
+                width: parent.width/2
+                height: parent.height*0.5
+                color: app.c2
+                anchors.horizontalCenter: parent.horizontalCenter
+                antialiasing: true
+            }
+        }
+        Rectangle{
+            id: agujaHoras
+            color: "transparent"
+            height: parent.height*0.5
+            width: !parent.width*0.02 % 2 ? parent.width*0.02 : parent.width*0.02+1
+            anchors.centerIn: parent
+            Rectangle{
+                width: parent.width
+                height: parent.height*0.5
+                color: "red"
+                antialiasing: true
+            }
+        }
+        Rectangle{
+            id: agujaSegundos
+            color: "transparent"
+            height: parent.height*0.8
+            width: !parent.width*0.01 % 2 && parent.width*0.01>0 ? parent.width*0.01 : parent.width*0.01+1
+            anchors.centerIn: parent
+            Rectangle{
+                width: parent.width/2
+                height: parent.height*0.5
+                color: "red"
+                anchors.horizontalCenter: parent.horizontalCenter
+                antialiasing: true
+            }
+        }
+        Rectangle{
+            id: centro
+            color: "red"
+            height: width
+            width: parent.width*0.05
+            radius: width*0.5
+            anchors.centerIn: parent
+        }
+    }
+
+    Timer{
+        id: t
+        running: true
+        repeat: true
+        interval: 1000
+        onTriggered:{
+            tic()
+        }
+    }
+
+    function tic(){
+        var d = new Date(Date.now())
+        app.h=d.getHours()
+        app.m=d.getMinutes()
+        app.s=d.getSeconds()
+        if(agujaSegundos.rotation>353&&agujaSegundos.rotation<360){
+            agujaSegundos.rotation = 0
+        }else{
+            agujaSegundos.rotation = (360/60)*app.s
+        }
+        var prm = agujaSegundos.rotation/360*100
+        var prm2 = (60/100*prm)/60
+        agujaMinutos.rotation =(360/60)*app.m + (360/60)*(prm2)
+
+        var prh = agujaMinutos.rotation/360*100
+        var prh2 = (12/100*prh)/12
+        agujaHoras.rotation = (360/12)*app.h + (360/12)*(prh2)
+    }
+
+    Component.onCompleted:{
+        appSettings.radnh = 0.98
+        appSettings.radlm = 0.8
+        app.width = appSettings.w
+        app.height = appSettings.h
+        app.x = appSettings.x
+        app.y = appSettings.y
+        tic()
+    }
 }
