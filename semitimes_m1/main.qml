@@ -35,7 +35,7 @@ ApplicationWindow{
     Rectangle{
         id: reloj
         width: app.width
-        height: app.height
+        height: app.width
         radius: width*0.5
         color: app.c5
         border.width:1
