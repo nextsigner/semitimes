@@ -105,10 +105,10 @@ ApplicationWindow{
             onDoubleClicked: {
                 Qt.quit()
             }
-           onClicked: {
-               xControls.width=xControls.parent.width*0.65
-               xControls.visible=true
-           }
+            onClicked: {
+                xControls.width=xControls.parent.width*0.65
+                xControls.visible=true
+            }
         }
 
         Rectangle{
@@ -319,9 +319,7 @@ ApplicationWindow{
                 if(index===1){
                     if(Qt.platform.os==='android'){
                         var j=unik.getPath(3)+'/unik/config.json'
-                        var f=unik.getPath(3)+'/unik/semitimes_m1'
-                        var c='{"mode":"-folder", "arg1":"'+f+'"}'
-                        unik.setFile(j, c)
+                        unik.deleteFile(j)
                         unik.restartApp()
                     }else{
                         app.close()
@@ -364,12 +362,14 @@ ApplicationWindow{
     }
 
     Component.onCompleted:{
-        appSettings.radnh = 0.98
-        appSettings.radlm = 0.8
-        app.width = appSettings.w
-        app.height = appSettings.h
-        app.x = appSettings.x
-        app.y = appSettings.y
+        if(Qt.platform.os!=='android'){
+            appSettings.radnh = 0.98
+            appSettings.radlm = 0.8
+            app.width = appSettings.w
+            app.height = appSettings.h
+            app.x = appSettings.x
+            app.y = appSettings.y
+        }
         tic()
     }
 }
