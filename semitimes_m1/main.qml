@@ -36,8 +36,8 @@ ApplicationWindow{
 
     Rectangle{
         id: reloj
-        width: app.width
-        height: app.width
+        width: app.width<app.height?app.width:app.height
+        height: width
         radius: width*0.5
         color: app.c5
         border.width:1
@@ -101,7 +101,7 @@ ApplicationWindow{
             property variant clickPos: "1,1"
             property bool presionado: false
             anchors.fill: parent
-            enabled: Qt.platform.os!=='android'
+            enabled: Qt.platform.os==='android'
             onDoubleClicked: {
                 Qt.quit()
             }
