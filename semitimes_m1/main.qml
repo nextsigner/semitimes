@@ -21,6 +21,8 @@ ApplicationWindow{
     property color c4: "black"
     property color c5: "#333333"
 
+    FontLoader {name: "FontAwesome";source: "qrc:/fontawesome-webfont.ttf";}
+
     Settings{
         id: appSettings
         category:'conf-semitimes-m1'
@@ -43,11 +45,17 @@ ApplicationWindow{
         anchors.centerIn: parent
         clip:true
         antialiasing: true
+
         MouseArea{
             id: max
             property variant clickPos: "1,1"
             property bool presionado: false
             anchors.fill: parent
+            enabled: Qt.platform.os!=='android'
+            onClicked: {
+                xControls.width=xControls.parent.width*0.65
+                xControls.visible=true
+            }
             onDoubleClicked: {
                 Qt.quit()
             }
@@ -87,12 +95,22 @@ ApplicationWindow{
                 appSettings.h = app.height
             }
         }
-        Image{
-            width: reloj.width*0.6
-            height: reloj.width*0.6
-            source: "file://"+sourcePath+"/cris.png"
-            anchors.centerIn: parent
+
+        MouseArea{
+            id: maxAndroid
+            property variant clickPos: "1,1"
+            property bool presionado: false
+            anchors.fill: parent
+            enabled: Qt.platform.os!=='android'
+            onDoubleClicked: {
+                Qt.quit()
+            }
+           onClicked: {
+               xControls.width=xControls.parent.width*0.65
+               xControls.visible=true
+           }
         }
+
         Rectangle{
             smooth: true
             width: 1
@@ -243,6 +261,76 @@ ApplicationWindow{
             width: parent.width*0.05
             radius: width*0.5
             anchors.centerIn: parent
+        }
+        Rectangle{
+            id: xControls
+            color: app.c5
+            border.width: 1
+            border.color: app.c2
+            height: width
+            width: !visible?0:parent.width*0.65
+            visible: false
+            radius: width*0.5
+            anchors.centerIn: parent
+            onWidthChanged:{
+                if(width===0){xControls.visible=false}
+            }
+            Behavior on width {
+                NumberAnimation {
+                    target: xControls
+                    property: "width"
+                    duration: 200
+                    easing.type: Easing.InOutQuad
+                }
+                NumberAnimation {
+                    target: xControls
+                    property: "height"
+                    duration: 200
+                    easing.type: Easing.InOutQuad
+                }
+            }
+            property var a: ['\uf0a8','\uf2d2','\uf011']
+            Repeater{
+                model:3
+                Item{
+                    width: parent.width*0.2
+                    height: parent.height*0.8
+                    anchors.centerIn: parent
+                    rotation: (360/3)*index
+                    Boton{
+                        t: xControls.a[index]
+                        w: parent.width
+                        h: w
+                        r: w*0.5
+                        b: app.c1
+                        c: app.c5
+                        s: w*0.7
+                        rotation: 0-(360/3)*index
+                        onClicking:{
+                            xControls.run(index)
+                        }
+                    }
+                }
+            }
+            function run(index){
+                if(index===0){
+                    xControls.width=0
+                }
+                if(index===1){
+                    if(Qt.platform.os==='android'){
+                        var j=unik.getPath(3)+'/unik/config.json'
+                        var f=unik.getPath(3)+'/unik/semitimes_m1'
+                        var c='{"mode":"-folder", "arg1":"'+f+'"}'
+                        unik.setFile(j, c)
+                        unik.restartApp()
+                    }else{
+                        app.close()
+                    }
+                }
+                if(index===2){
+                    Qt.quit()
+                }
+            }
         }
     }
 
