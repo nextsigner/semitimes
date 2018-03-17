@@ -51,11 +51,7 @@ ApplicationWindow{
             property variant clickPos: "1,1"
             property bool presionado: false
             anchors.fill: parent
-            enabled: Qt.platform.os!=='android'
-            onClicked: {
-                xControls.width=xControls.parent.width*0.65
-                xControls.visible=true
-            }
+            enabled: Qt.platform.os!=='android'            
             onDoubleClicked: {
                 Qt.quit()
             }
@@ -97,14 +93,10 @@ ApplicationWindow{
         }
 
         MouseArea{
-            id: maxAndroid
-            property variant clickPos: "1,1"
-            property bool presionado: false
-            anchors.fill: parent
-            enabled: Qt.platform.os==='android'
-            onDoubleClicked: {
-                Qt.quit()
-            }
+            id: maxAndroid            
+            width: parent.width*0.25
+            height: width
+            anchors.centerIn: parent
             onClicked: {
                 xControls.width=xControls.parent.width*0.65
                 xControls.visible=true
