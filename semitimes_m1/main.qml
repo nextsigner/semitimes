@@ -39,7 +39,7 @@ ApplicationWindow{
         width: app.width<app.height?app.width:app.height
         height: width
         radius: width*0.5
-        color: "#ccc"
+        color: app.c5
         border.width:1
         border.color: app.c1
         anchors.centerIn: parent
