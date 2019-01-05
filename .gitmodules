@@ -1,3 +1,6 @@
 [submodule "semitimes-a1"]
 	path = semitimes-a1
 	url = https://github.com/nextsigner/semitimes-a1
+[submodule "semitimes-m1"]
+	path = semitimes-m1
+	url = https://github.com/nextsigner/semitimes-m1
